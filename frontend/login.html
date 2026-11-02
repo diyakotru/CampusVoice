@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Login — CampusVoice</title>
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+  <link href="css/dashboard.css" rel="stylesheet">
+</head>
+<body class="admin-login-bg">
+  <main class="auth-wrap">
+    <div class="auth-card">
+      <div class="text-center mb-4 text-white">
+        <img src="assets/logo.svg" alt="" width="60" height="60" class="mb-3 rounded-4 shadow">
+        <h1 class="h3 mb-1">Admin Portal</h1>
+        <p class="small mb-0 opacity-75">CampusVoice feedback management</p>
+      </div>
+      <div class="card-soft p-4 p-md-5">
+        <div id="notice" class="alert alert-warning small d-none" role="status"></div>
+        <form id="adminLoginForm" novalidate>
+          <div class="mb-3">
+            <label class="form-label" for="username">Username</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white"><i class="bi bi-person"></i></span>
+              <input class="form-control" id="username" name="username" autocomplete="username" maxlength="50" required autofocus>
+            </div>
+            <div class="invalid-feedback" data-error-for="username"></div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label" for="password">Password</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white"><i class="bi bi-key"></i></span>
+              <input class="form-control" type="password" id="password" name="password" autocomplete="current-password" maxlength="128" required>
+              <button class="btn btn-outline-secondary border" type="button" id="togglePw" aria-label="Show password"><i class="bi bi-eye"></i></button>
+            </div>
+            <div class="invalid-feedback" data-error-for="password"></div>
+          </div>
+          <div id="loginAlert" class="alert alert-danger small d-none" role="alert"></div>
+          <button class="btn btn-primary w-100 py-2" type="submit" id="loginBtn"><i class="bi bi-shield-lock me-2"></i>Sign in securely</button>
+        </form>
+        <div class="text-center mt-4"><a href="index.html" class="small text-decoration-none"><i class="bi bi-arrow-left me-1"></i>Back to student portal</a></div>
+      </div>
+      <p class="text-center small mt-3 mb-0 text-white opacity-75"><i class="bi bi-lock-fill me-1"></i>Authorised college staff only. Attempts are rate-limited.</p>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/admin-login.js"></script>
+</body>
+</html>

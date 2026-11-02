@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CampusVoice — Cloud Feedback System</title>
+  <meta name="description" content="Submit feedback about faculty, infrastructure, library, canteen and events. Stored securely in the cloud.">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+  <!-- ============ Navigation ============ -->
+  <nav class="navbar navbar-expand-lg site-nav sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html"><img src="assets/logo.svg" alt="">CampusVoice</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+          <li class="nav-item"><a class="nav-link" href="#how">How it works</a></li>
+          <li class="nav-item"><a class="nav-link" href="feedback.html">Give Feedback</a></li>
+          <li class="nav-item" data-show="student-logged-out"><a class="nav-link" href="student-login.html">Student Login</a></li>
+          <li class="nav-item d-none" data-show="student-logged-in"><a class="nav-link" href="history.html"><i class="bi bi-clock-history me-1"></i>My Submissions</a></li>
+          <li class="nav-item d-none" data-show="student-logged-in"><a class="nav-link" href="#" data-action="student-logout"><i class="bi bi-box-arrow-right me-1"></i>Logout</a></li>
+          <li class="nav-item ms-lg-2 mt-2 mt-lg-0"><a class="btn btn-outline-primary btn-sm" href="login.html"><i class="bi bi-shield-lock me-1"></i>Admin</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- ============ Hero ============ -->
+    <section class="hero">
+      <div class="container">
+        <div class="row align-items-center g-5">
+          <div class="col-lg-7">
+            <span class="hero-badge mb-3"><i class="bi bi-cloud-check"></i> Cloud-hosted · Secure · Anytime, anywhere</span>
+            <h1 class="mb-3">Your voice shapes a better campus.</h1>
+            <p class="lead mb-4">CampusVoice lets students share honest feedback about teaching, facilities and campus life.
+              Every response is stored securely in a cloud database and reviewed by the college administration.</p>
+            <div class="d-flex flex-wrap gap-2">
+              <a href="feedback.html" class="btn btn-light-brand btn-lg"><i class="bi bi-pencil-square me-2"></i>Submit Feedback</a>
+              <a href="#how" class="btn btn-ghost-light btn-lg">How it works</a>
+            </div>
+            <div class="d-flex flex-wrap gap-4 mt-4 small" style="color:rgba(255,255,255,.8)">
+              <span><i class="bi bi-lightning-charge me-1"></i>Takes 2 minutes</span>
+              <span><i class="bi bi-phone me-1"></i>Works on any device</span>
+              <span><i class="bi bi-lock me-1"></i>Visible only to admins</span>
+            </div>
+          </div>
+          <div class="col-lg-5 d-none d-lg-block">
+            <div class="hero-card">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="fw-bold">What students can rate</div>
+                <span class="badge-cat small">6 categories</span>
+              </div>
+              <div class="vstack gap-3 small">
+                <div class="d-flex align-items-center gap-3"><div class="icon-tile"><i class="bi bi-person-video3"></i></div><div class="flex-grow-1"><div class="fw-semibold">Faculty and Teaching</div><div class="text-ink-3">Clarity, pace, doubt solving</div></div></div>
+                <div class="d-flex align-items-center gap-3"><div class="icon-tile"><i class="bi bi-building"></i></div><div class="flex-grow-1"><div class="fw-semibold">Infrastructure</div><div class="text-ink-3">Classrooms, labs, Wi-Fi</div></div></div>
+                <div class="d-flex align-items-center gap-3"><div class="icon-tile"><i class="bi bi-book"></i></div><div class="flex-grow-1"><div class="fw-semibold">Library</div><div class="text-ink-3">Books, timings, e-resources</div></div></div>
+                <div class="d-flex align-items-center gap-3"><div class="icon-tile"><i class="bi bi-cup-hot"></i></div><div class="flex-grow-1"><div class="fw-semibold">Canteen · Events · Overall</div><div class="text-ink-3">Food, fests, campus life</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ About ============ -->
+    <section class="section" id="features">
+      <div class="container">
+        <div class="text-center mb-5">
+          <div class="section-eyebrow mb-2">About the system</div>
+          <h2 class="mb-3">Feedback that actually reaches the right people</h2>
+          <p class="text-ink-2 mx-auto" style="max-width:640px">Paper forms get lost and are hard to analyse. CampusVoice collects feedback online,
+            stores it in a secure cloud database, and gives administrators live analytics to act on it.</p>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-3">
+            <div class="card-soft card-lift p-4 h-100">
+              <div class="icon-tile mb-3"><i class="bi bi-ui-checks"></i></div>
+              <h5>Simple form</h5>
+              <p class="text-ink-2 mb-0 small">Pick a category, rate with stars, describe your experience and suggest improvements.</p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="card-soft card-lift p-4 h-100">
+              <div class="icon-tile mb-3"><i class="bi bi-cloud-arrow-up"></i></div>
+              <h5>Stored in the cloud</h5>
+              <p class="text-ink-2 mb-0 small">Responses are saved in a managed PostgreSQL database — available from anywhere, never lost.</p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="card-soft card-lift p-4 h-100">
+              <div class="icon-tile mb-3"><i class="bi bi-bar-chart-line"></i></div>
+              <h5>Live analytics</h5>
+              <p class="text-ink-2 mb-0 small">Admins see ratings by category, trends over time, and can export reports in one click.</p>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="card-soft card-lift p-4 h-100">
+              <div class="icon-tile mb-3"><i class="bi bi-shield-check"></i></div>
+              <h5>Private &amp; secure</h5>
+              <p class="text-ink-2 mb-0 small">Your details are visible only to authorised administrators. Passwords are hashed and sessions protected.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ How it works ============ -->
+    <section class="section bg-white border-top border-bottom" id="how">
+      <div class="container">
+        <div class="row g-5 align-items-center">
+          <div class="col-lg-5">
+            <div class="section-eyebrow mb-2">How it works</div>
+            <h2 class="mb-3">Three steps from your phone to the principal's dashboard</h2>
+            <p class="text-ink-2">Optionally create a student account to keep a private history of everything you've submitted.</p>
+            <div class="d-flex gap-2 mt-4 flex-wrap">
+              <a href="feedback.html" class="btn btn-primary"><i class="bi bi-pencil-square me-2"></i>Submit Feedback</a>
+              <a href="student-login.html" class="btn btn-outline-primary" data-show="student-logged-out">Create student account</a>
+              <a href="history.html" class="btn btn-outline-primary d-none" data-show="student-logged-in">View my submissions</a>
+            </div>
+          </div>
+          <div class="col-lg-7">
+            <div class="vstack gap-3">
+              <div class="card-soft p-4 d-flex gap-3"><div class="step-num">1</div><div><h6 class="mb-1">Fill the feedback form</h6><p class="small text-ink-2 mb-0">Choose a category, give a 1–5 star rating and describe your experience. The form checks your input before sending.</p></div></div>
+              <div class="card-soft p-4 d-flex gap-3"><div class="step-num">2</div><div><h6 class="mb-1">Securely sent to the cloud</h6><p class="small text-ink-2 mb-0">Your browser sends the data over HTTPS to our Flask API, which validates it again and saves it to Supabase PostgreSQL.</p></div></div>
+              <div class="card-soft p-4 d-flex gap-3"><div class="step-num">3</div><div><h6 class="mb-1">Reviewed by administrators</h6><p class="small text-ink-2 mb-0">Admins log in to a protected dashboard to search, filter, analyse and export feedback — and act on it.</p></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CTA ============ -->
+    <section class="section">
+      <div class="container">
+        <div class="card-soft p-4 p-md-5 text-center" style="background:linear-gradient(135deg,var(--brand-50),#fff)">
+          <h3 class="mb-2">Have something to say about your college?</h3>
+          <p class="text-ink-2 mb-4">It takes less than two minutes and helps every student after you.</p>
+          <a href="feedback.html" class="btn btn-primary btn-lg"><i class="bi bi-send me-2"></i>Give Feedback Now</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ Footer ============ -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-5">
+          <div class="brand mb-2"><img src="assets/logo.svg" alt="" width="28" height="28">CampusVoice</div>
+          <p class="mb-0">A cloud-based feedback collection system built with Flask, Supabase PostgreSQL and Render.</p>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="fw-semibold text-white mb-2">Students</div>
+          <ul class="list-unstyled vstack gap-1 mb-0">
+            <li><a href="feedback.html">Submit feedback</a></li>
+            <li><a href="student-login.html">Student login</a></li>
+            <li><a href="history.html">My submissions</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-md-4">
+          <div class="fw-semibold text-white mb-2">Administration</div>
+          <ul class="list-unstyled vstack gap-1 mb-0">
+            <li><a href="login.html">Admin login</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+          </ul>
+        </div>
+      </div>
+      <hr class="border-secondary my-4">
+      <div class="small">&copy; <span id="year"></span> CampusVoice · Cloud Computing Project</div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/index.js"></script>
+</body>
+</html>

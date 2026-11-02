@@ -1,0 +1,5 @@
+-r requirements.txt
+pytest==8.3.5
+# Starts a throw-away local PostgreSQL server for the automated tests,
+# so tests never touch your real Supabase data.
+pgserver
