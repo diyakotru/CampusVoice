@@ -162,6 +162,9 @@ Optional, for a demo with charts full of data: `python manage.py seed-demo --cou
 | `SESSION_COOKIE_SECURE` | no | `true` in production | HTTPS-only cookie |
 | `RATELIMIT_STORAGE_URI` | no | `memory://` | e.g. Redis URL when running several instances |
 | `SERVE_FRONTEND` | no | `true` | Flask serves `frontend/` |
+| `GOOGLE_CLIENT_ID` | no | `1234-abc.apps.googleusercontent.com` | Enables "Sign in with Google" for students. Empty = button hidden |
+
+**Setting up Google sign-in:** Google Cloud Console → APIs & Services → *OAuth consent screen* (External, add app name + your email), then *Credentials → Create credentials → OAuth client ID → Web application*. Under **Authorized JavaScript origins** add `http://localhost:5000`, `http://localhost` and your Vercel URL (e.g. `https://campusvoice.vercel.app`). No redirect URI or client secret is needed. Copy the Client ID into `GOOGLE_CLIENT_ID` (in `backend/.env` and in Vercel's environment variables), and re-run `database/schema.sql` once so the `students` table gets the `google_sub` and `email` columns.
 
 ## 10. API documentation
 Base URL: same origin (e.g. `https://campusvoice.vercel.app`). All bodies are JSON. Errors look like `{"error": "message", "fields": {"field": "message"}}`.
@@ -207,6 +210,8 @@ Rules: name 2–100 letters; student ID 3–20 of `A-Z 0-9 / _ -`; department fr
 | `POST /api/student/logout` | `{}` |
 | `GET /api/student/me` | Logged-in student (401 if not) |
 | `GET /api/student/feedback` | The student's own submissions `{items, total}` |
+| `POST /api/student/google` | `{credential}` (Google ID token, verified on the server). Known account → logged in, `needs_profile:false`. New account → `needs_profile:true`. 401 invalid token, 404 if Google sign-in is off |
+| `POST /api/student/google/complete` | First Google sign-in: `{full_name, student_id, department}` → 201 and logged in. 409 if the Student ID already has an account |
 
 Try it with curl:
 ```bash

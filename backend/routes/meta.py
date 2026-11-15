@@ -5,7 +5,7 @@ Public helper endpoints.
     GET /api/meta    – lists for the form drop-downs (categories, departments)
     GET /api/session – is this browser logged in as an admin and/or student?
 """
-from flask import Blueprint, jsonify, session
+from flask import Blueprint, current_app, jsonify, session
 
 from database import DatabaseUnavailable, check_connection
 from utils.auth import current_student
@@ -31,7 +31,9 @@ def health():
 
 @bp.get("/meta")
 def meta():
-    return jsonify(categories=CATEGORIES, departments=DEPARTMENTS, semesters=SEMESTERS)
+    # google_client_id is public (Google puts it in every sign-in page); null = button hidden
+    return jsonify(categories=CATEGORIES, departments=DEPARTMENTS, semesters=SEMESTERS,
+                   google_client_id=current_app.config["GOOGLE_CLIENT_ID"] or None)
 
 
 @bp.get("/session")

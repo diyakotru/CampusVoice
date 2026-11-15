@@ -67,6 +67,12 @@ class Config:
     RATELIMIT_ENABLED = _bool("RATELIMIT_ENABLED", True)
     RATELIMIT_HEADERS_ENABLED = True
 
+    # ---- "Sign in with Google" for students ----
+    # OAuth Client ID from Google Cloud Console (APIs & Services → Credentials).
+    # It is public (it appears in the page); there is no client secret in this flow.
+    # Leave empty to hide the Google button.
+    GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "").strip()
+
     # Reject request bodies larger than 64 KB
     MAX_CONTENT_LENGTH = 64 * 1024
 

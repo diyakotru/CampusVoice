@@ -25,6 +25,20 @@ CREATE TABLE IF NOT EXISTS students (
     CONSTRAINT students_name_length       CHECK (char_length(full_name) BETWEEN 2 AND 100)
 );
 
+-- "Sign in with Google" (added later; safe to re-run on an existing database).
+-- google_sub is Google's permanent account ID. Google-only accounts have no
+-- password, so password_hash may be NULL — but every account needs one or the other.
+ALTER TABLE students ADD COLUMN IF NOT EXISTS google_sub VARCHAR(255) UNIQUE;
+ALTER TABLE students ADD COLUMN IF NOT EXISTS email      VARCHAR(255);
+ALTER TABLE students ALTER COLUMN password_hash DROP NOT NULL;
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'students_has_login_method') THEN
+        ALTER TABLE students ADD CONSTRAINT students_has_login_method
+            CHECK (password_hash IS NOT NULL OR google_sub IS NOT NULL);
+    END IF;
+END $$;
+
 -- ---------------------------------------------------------------------
 -- 2. feedback — one row per submitted feedback form
 -- ---------------------------------------------------------------------

@@ -72,10 +72,38 @@ def authenticate_student(student_id, password):
             (student_id.upper(),),
         )
         student = cur.fetchone()
-    if student is None:
+    # Google-only accounts have no password: they can never log in this way.
+    if student is None or student["password_hash"] is None:
         check_password_hash(_DUMMY_HASH, password)
         return None
     if not check_password_hash(student["password_hash"], password):
         return None
     student.pop("password_hash")
     return dict(student)
+
+
+# ------------------------------------------------------------------ Google sign-in
+def find_student_by_google_sub(google_sub):
+    with get_cursor() as cur:
+        cur.execute(
+            "SELECT id, student_id, full_name, department FROM students WHERE google_sub = %s",
+            (google_sub,),
+        )
+        row = cur.fetchone()
+    return dict(row) if row else None
+
+
+def create_google_student(data, google_sub, email):
+    """A student account with no password, identified by its Google account."""
+    from psycopg2 import errors
+
+    try:
+        with get_cursor(commit=True) as cur:
+            cur.execute(
+                "INSERT INTO students (student_id, full_name, department, google_sub, email) "
+                "VALUES (%s, %s, %s, %s, %s) RETURNING id, student_id, full_name, department",
+                (data["student_id"], data["full_name"], data["department"], google_sub, email),
+            )
+            return cur.fetchone()
+    except errors.UniqueViolation as exc:
+        raise StudentExists() from exc

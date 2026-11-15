@@ -184,6 +184,9 @@ h1, h2, h3, h4, h5, .brand-font { font-weight: 700; letter-spacing: -0.02em; }
 .auth-card { width: 100%; max-width: 440px; }
 .auth-tabs .nav-link { font-weight: 600; color: var(--ink-3); border-radius: 10px; }
 .auth-tabs .nav-link.active { background: var(--brand-50); color: var(--brand-700); }
+.google-btn-slot { display: flex; justify-content: center; min-height: 44px; }
+.auth-divider { display: flex; align-items: center; gap: .75rem; color: var(--ink-3); font-size: .8rem; }
+.auth-divider::before, .auth-divider::after { content: ""; flex: 1; border-top: 1px solid rgba(0, 0, 0, .1); }
 
 /* Toasts */
 .toast-container { z-index: 1090; }

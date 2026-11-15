@@ -22,6 +22,7 @@ def login_admin(admin):
 def login_student(student):
     # keep an admin session if the same browser has one; replace student data
     session.pop("student_account_id", None)
+    session.pop("google_pending", None)
     session.permanent = True
     session["student_account_id"] = student["id"]
     session["student_id"] = student["student_id"]
@@ -35,7 +36,8 @@ def logout_admin():
 
 
 def logout_student():
-    for key in ("student_account_id", "student_id", "student_name", "student_department"):
+    for key in ("student_account_id", "student_id", "student_name", "student_department",
+                "google_pending"):
         session.pop(key, None)
 
 

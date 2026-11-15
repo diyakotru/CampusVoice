@@ -39,6 +39,50 @@
       </div>
 
       <div class="card-soft p-4">
+        <!-- Sign in with Google (shown only when the server has GOOGLE_CLIENT_ID set) -->
+        <div id="googleSection" class="d-none">
+          <div id="googleButton" class="google-btn-slot"></div>
+          <div class="alert alert-danger small d-none mt-3 mb-0" id="googleAlert" role="alert"></div>
+          <div class="auth-divider my-4"><span>or use your Student ID</span></div>
+        </div>
+
+        <!-- First Google sign-in: Google doesn't know the Student ID or department -->
+        <div id="googleProfile" class="d-none">
+          <h2 class="h6 mb-1">Almost done</h2>
+          <p class="small text-ink-2 mb-3">Signed in as <strong id="googleEmail"></strong>. Add your college details to finish creating your account.</p>
+          <form id="googleProfileForm" novalidate>
+            <div class="mb-3">
+              <label class="form-label" for="g_full_name">Full name</label>
+              <input class="form-control" id="g_full_name" name="full_name" autocomplete="name" maxlength="100" required>
+              <div class="invalid-feedback" data-error-for="full_name"></div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="g_student_id">Student ID</label>
+              <input class="form-control text-uppercase" id="g_student_id" name="student_id" maxlength="20" required>
+              <div class="invalid-feedback" data-error-for="student_id"></div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="g_department">Department</label>
+              <select class="form-select" id="g_department" name="department" required>
+                <option value="" selected disabled>Select department</option>
+                <option>Computer Science and Engineering</option>
+                <option>Information Technology</option>
+                <option>Electronics and Communication</option>
+                <option>Electrical and Electronics</option>
+                <option>Mechanical Engineering</option>
+                <option>Civil Engineering</option>
+                <option>Business Administration</option>
+                <option>Other</option>
+              </select>
+              <div class="invalid-feedback" data-error-for="department"></div>
+            </div>
+            <div class="alert alert-danger small d-none" data-role="alert" role="alert"></div>
+            <button class="btn btn-primary w-100" type="submit"><i class="bi bi-check2-circle me-2"></i>Finish sign-up</button>
+            <button class="btn btn-link btn-sm w-100 mt-2" type="button" id="googleCancel">Cancel</button>
+          </form>
+        </div>
+
+        <div id="passwordAuth">
         <ul class="nav nav-pills nav-fill auth-tabs mb-4" role="tablist">
           <li class="nav-item" role="presentation">
             <button class="nav-link active" id="tab-login" data-bs-toggle="pill" data-bs-target="#pane-login" type="button" role="tab" aria-controls="pane-login" aria-selected="true">Log in</button>
@@ -111,6 +155,7 @@
             </form>
           </div>
         </div>
+        </div><!-- /passwordAuth -->
       </div>
       <p class="text-center small text-ink-3 mt-3 mb-0">An account is optional — you can <a href="feedback.html">submit feedback without one</a>.</p>
     </div>

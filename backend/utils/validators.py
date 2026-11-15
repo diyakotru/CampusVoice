@@ -148,6 +148,20 @@ def validate_student_registration(data):
     return clean, errors
 
 
+def validate_google_profile(data):
+    """Profile details a first-time Google user adds (Google doesn't know them)."""
+    errors = {}
+    if not isinstance(data, dict):
+        return None, {"_": "Request body must be a JSON object."}
+    name = _text(data, "full_name")
+    clean = {
+        "full_name": validate_name(_collapse_spaces(name) if name else name, errors, "full_name"),
+        "student_id": validate_student_id(_text(data, "student_id"), errors),
+        "department": validate_department(_text(data, "department"), errors),
+    }
+    return clean, errors
+
+
 def validate_login(data, id_field):
     """Basic shape check for login bodies. Wrong credentials are handled separately."""
     if not isinstance(data, dict):

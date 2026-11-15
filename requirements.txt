@@ -5,3 +5,5 @@ flask-cors==6.0.1
 Flask-Limiter==3.12
 psycopg2-binary==2.9.10
 python-dotenv==1.2.1
+google-auth==2.40.3
+requests==2.32.5

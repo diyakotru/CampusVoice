@@ -25,13 +25,17 @@ log = logging.getLogger("app")
 
 # Content-Security-Policy: the browser may only load scripts/styles/fonts
 # from our own origin and the two CDNs we use. This blunts XSS attacks.
+# accounts.google.com/gsi/ is Google's "Sign in with Google" button (script,
+# its stylesheet, and the iframe/popup it talks to).
+GSI = "https://accounts.google.com/gsi/"
 CSP = (
     "default-src 'self'; "
-    "script-src 'self' https://cdn.jsdelivr.net; "
-    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; "
+    f"script-src 'self' https://cdn.jsdelivr.net {GSI}client; "
+    f"style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com {GSI}style; "
     "font-src 'self' https://cdn.jsdelivr.net https://fonts.gstatic.com; "
     "img-src 'self' data: blob:; "
-    "connect-src 'self'; "
+    f"connect-src 'self' {GSI}; "
+    f"frame-src {GSI}; "
     "frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
 )
 

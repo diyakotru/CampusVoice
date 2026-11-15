@@ -301,3 +301,108 @@ def test_session_endpoint_reports_only_own_login_state(app, client, admin_client
     register(client)
     body = client.get("/api/session").get_json()
     assert body["admin"] is None and body["student"]["student_id"] == "21IT007"
+
+
+# ------------------------------------------------------------------ Sign in with Google
+import pytest  # noqa: E402
+
+from utils import google_auth  # noqa: E402
+
+FAKE_TOKENS = {
+    "token-neha": {"sub": "google-111", "email": "neha@gmail.com", "name": "Neha Joshi"},
+    "token-om": {"sub": "google-222", "email": "om@gmail.com", "name": "Om Prakash"},
+}
+
+
+@pytest.fixture
+def google_enabled(app, monkeypatch):
+    """Turn Google sign-in on and replace Google's signature check with a fake
+    (real ID tokens can only be minted by Google). Everything else is real."""
+    def fake_verify(token, client_id):
+        assert client_id == "test-client-id.apps.googleusercontent.com"
+        if token not in FAKE_TOKENS:
+            raise google_auth.InvalidGoogleToken("bad token")
+        return dict(FAKE_TOKENS[token])
+    monkeypatch.setitem(app.config, "GOOGLE_CLIENT_ID", "test-client-id.apps.googleusercontent.com")
+    monkeypatch.setattr(google_auth, "verify_google_token", fake_verify)
+
+
+def google_profile(client, sid="21IT050", name="Neha Joshi"):
+    return client.post("/api/student/google/complete", json={
+        "full_name": name, "student_id": sid, "department": "Information Technology"})
+
+
+def test_google_disabled_by_default(client):
+    assert client.get("/api/meta").get_json()["google_client_id"] is None
+    assert client.post("/api/student/google", json={"credential": "token-neha"}).status_code == 404
+
+
+def test_google_first_login_then_returning_login(app, client, google_enabled, db):
+    assert client.get("/api/meta").get_json()["google_client_id"].startswith("test-client-id")
+
+    r = client.post("/api/student/google", json={"credential": "token-neha"})
+    body = r.get_json()
+    assert r.status_code == 200 and body["needs_profile"] is True and body["email"] == "neha@gmail.com"
+    assert client.get("/api/student/me").status_code == 401        # not logged in yet
+
+    assert google_profile(client, sid="21it050").status_code == 201
+    assert client.get("/api/student/me").get_json()["student"]["student_id"] == "21IT050"
+    with db.cursor() as cur:
+        cur.execute("SELECT google_sub, email, password_hash FROM students WHERE student_id = '21IT050'")
+        assert cur.fetchone() == ("google-111", "neha@gmail.com", None)
+
+    # a fresh browser: same Google account logs straight in
+    c = app.test_client()
+    r = c.post("/api/student/google", json={"credential": "token-neha"})
+    assert r.status_code == 200 and r.get_json()["needs_profile"] is False
+    assert c.get("/api/student/me").get_json()["student"]["student_id"] == "21IT050"
+    submit(c)
+    assert c.get("/api/student/feedback").get_json()["total"] == 1
+
+
+def test_google_invalid_token_rejected(client, google_enabled):
+    assert client.post("/api/student/google", json={"credential": "forged"}).status_code == 401
+    assert client.post("/api/student/google", json={}).status_code == 401
+    assert client.post("/api/student/google", data="x", content_type="text/plain").status_code == 415
+
+
+def test_google_complete_requires_verified_google_identity(client, google_enabled):
+    r = google_profile(client)
+    assert r.status_code == 401
+    assert client.get("/api/student/me").status_code == 401
+
+
+def test_google_cannot_take_over_existing_student_id(app, client, google_enabled):
+    assert register(app.test_client(), sid="21IT007").status_code == 201   # password account
+    client.post("/api/student/google", json={"credential": "token-om"})
+    r = google_profile(client, sid="21IT007", name="Om Prakash")
+    assert r.status_code == 409
+    assert client.get("/api/student/me").status_code == 401
+
+
+def test_google_profile_validated(client, google_enabled):
+    client.post("/api/student/google", json={"credential": "token-neha"})
+    r = client.post("/api/student/google/complete", json={"full_name": "x", "student_id": "!", "department": "Nope"})
+    assert r.status_code == 400
+    assert set(r.get_json()["fields"]) == {"full_name", "student_id", "department"}
+
+
+def test_google_only_account_cannot_password_login(app, client, google_enabled):
+    client.post("/api/student/google", json={"credential": "token-neha"})
+    google_profile(client, sid="21IT050")
+    c = app.test_client()
+    assert c.post("/api/student/login", json={"student_id": "21IT050", "password": "anything1"}).status_code == 401
+
+
+def test_google_pending_identity_expires(client, google_enabled, monkeypatch):
+    import routes.student as student_routes
+    client.post("/api/student/google", json={"credential": "token-neha"})
+    real_time = student_routes.time.time
+    monkeypatch.setattr(student_routes.time, "time", lambda: real_time() + 16 * 60)
+    assert google_profile(client).status_code == 401
+
+
+def test_csp_allows_google_sign_in(client):
+    csp = client.get("/student-login.html").headers["Content-Security-Policy"]
+    assert "https://accounts.google.com/gsi/client" in csp
+    assert "frame-src https://accounts.google.com/gsi/" in csp
