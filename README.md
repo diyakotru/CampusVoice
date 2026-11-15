@@ -7,10 +7,9 @@ A web platform where students submit feedback about their college (faculty, infr
 ---
 
 ## Contents
-1. [Problem statement](#1-problem-statement) · 2. [Objectives](#2-objectives) · 3. [Features](#3-features) · 4. [Technologies](#4-technologies) · 5. [Architecture](#5-system-architecture) · 6. [Database schema](#6-database-schema) · 7. [Project structure](#7-project-structure) · 8. [Local setup](#8-installation--local-setup) · 9. [Environment variables](#9-environment-variables) · 10. [API documentation](#10-api-documentation) · 11. [Cloud deployment](#11-cloud-deployment) · 12. [Testing](#12-testing) · 13. [Screenshots](#13-screenshots) · 14. [Future enhancements](#14-future-enhancements) · 15. [Status checklist](#15-implementation-status)
+1. [Problem statement](#1-problem-statement) · 2. [Objectives](#2-objectives) · 3. [Features](#3-features) · 4. [Technologies](#4-technologies) · 5. [Architecture](#5-system-architecture) · 6. [Database schema](#6-database-schema) · 7. [Project structure](#7-project-structure) · 8. [Local setup](#8-installation--local-setup) · 9. [Environment variables](#9-environment-variables) · 10. [API documentation](#10-api-documentation) · 11. [Cloud deployment](#11-cloud-deployment) · 12. [Testing](#12-testing) · 13. [Screenshots](#13-screenshots) · 14. [Future enhancements](#14-future-enhancements) 
 
-More documents: [Architecture & cloud concepts](docs/architecture.md) · [Deployment guide](docs/deployment.md) · [Viva questions](docs/viva-questions.md)
-
+More documents: [Architecture & cloud concepts](docs/architecture.md) · [Deployment guide](docs/deployment.md) 
 ---
 
 ## 1. Problem statement
