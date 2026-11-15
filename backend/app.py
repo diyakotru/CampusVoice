@@ -2,7 +2,7 @@
 Entry point of the Flask backend.
 
 Locally:      python app.py                      → http://localhost:5000
-On Render:    gunicorn app:app  (see render.yaml)
+On Vercel:    api/index.py imports this app (see vercel.json)
 
 create_app() builds the application: loads config, connects the database
 layer, registers the API blueprints, and (optionally) serves the frontend
@@ -44,7 +44,7 @@ def create_app(overrides=None):
     if overrides:
         app.config.update(overrides)
 
-    # Render (and most clouds) put a proxy in front of the app. ProxyFix makes
+    # Vercel (and most clouds) put a proxy in front of the app. ProxyFix makes
     # request.remote_addr / request.scheme reflect the real client and HTTPS.
     if app.config["PROXY_COUNT"]:
         n = app.config["PROXY_COUNT"]

@@ -3,7 +3,7 @@ Application configuration.
 
 Every secret (database URL, session key) is read from ENVIRONMENT VARIABLES,
 never written in code. Locally they come from backend/.env (loaded by
-python-dotenv); on Render they are set in the service's "Environment" tab.
+python-dotenv); on Vercel they are set in Project → Settings → Environment Variables.
 """
 import os
 from datetime import timedelta
@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BASE_DIR.parent
 
-# Load backend/.env if it exists (does nothing on Render, where no .env file exists)
+# Load backend/.env if it exists (does nothing on Vercel, where no .env file exists)
 load_dotenv(BASE_DIR / ".env")
 
 
@@ -70,7 +70,7 @@ class Config:
     # Reject request bodies larger than 64 KB
     MAX_CONTENT_LENGTH = 64 * 1024
 
-    # Number of reverse proxies in front of the app (Render has 1).
+    # Number of reverse proxies in front of the app (Vercel has 1).
     # Needed so rate limiting sees the real client IP, not the proxy's.
     PROXY_COUNT = int(os.environ.get("PROXY_COUNT", "1" if IS_PRODUCTION else "0"))
 

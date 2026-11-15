@@ -1,6 +1,6 @@
 # CampusVoice — Cloud-Based Feedback Collection System
 
-A web platform where students submit feedback about their college (faculty, infrastructure, library, canteen, events, overall experience) from any device. Administrators review it in a secure dashboard with search, analytics and reports. All data is stored in a **cloud PostgreSQL database (Supabase)**, and the application is built to be **hosted on Render**.
+A web platform where students submit feedback about their college (faculty, infrastructure, library, canteen, events, overall experience) from any device. Administrators review it in a secure dashboard with search, analytics and reports. All data is stored in a **cloud PostgreSQL database (Supabase)**, and both the frontend and the backend are **deployed on Vercel**.
 
 ![Admin dashboard](docs/screenshots/06-dashboard-overview.png)
 
@@ -52,7 +52,7 @@ Colleges usually collect feedback on paper or through scattered forms. Responses
 | Backend | **Python 3.10+**, **Flask 3**, Flask-CORS, Flask-Limiter | REST API, auth, rate limiting |
 | DB driver | psycopg2 (connection pool) | Talks to PostgreSQL over TLS |
 | Database | **Supabase PostgreSQL** | Cloud database (DBaaS) |
-| Hosting | **Render** web service + Gunicorn | Cloud hosting (PaaS) |
+| Hosting | **Vercel** (frontend + Flask backend as a Python serverless function) | Cloud hosting (PaaS) |
 | Tooling | VS Code, Git, GitHub, pytest, Playwright | Development & testing |
 
 No React, TypeScript, Docker or Kubernetes.
@@ -61,8 +61,8 @@ No React, TypeScript, Docker or Kubernetes.
 
 ```
 ┌──────────────────┐  HTTPS / JSON  ┌─────────────────────────────┐  SQL over TLS  ┌─────────────────────┐
-│ Browser (any     │ ─────────────▶ │ Render web service          │ ─────────────▶ │ Supabase            │
-│ device, anywhere)│ ◀───────────── │ Gunicorn → Flask            │ ◀───────────── │ PostgreSQL          │
+│ Browser (any     │ ─────────────▶ │ Vercel (serverless)         │ ─────────────▶ │ Supabase            │
+│ device, anywhere)│ ◀───────────── │ Flask function              │ ◀───────────── │ PostgreSQL          │
 │ HTML·CSS·JS      │                │ /api/* REST + static pages  │                │ feedback, admins,   │
 └──────────────────┘                └─────────────────────────────┘                │ students            │
                                      secrets from env variables                    └─────────────────────┘
@@ -114,7 +114,9 @@ Cloud_Feedback_System/
 │   ├── requirements.txt · requirements-dev.txt · .env.example · pytest.ini
 ├── database/schema.sql
 ├── docs/  architecture.md · deployment.md · viva-questions.md · screenshots/
-├── render.yaml                # Render Blueprint (infrastructure as code)
+├── api/index.py               # Vercel entry point (exposes the Flask app)
+├── vercel.json                # Vercel routing + bundled files (infrastructure as code)
+├── requirements.txt           # Python packages installed by Vercel
 ├── README.md
 └── .gitignore
 ```
@@ -133,7 +135,7 @@ pip install -r backend/requirements-dev.txt
 # 2. Configure secrets
 cd backend
 copy .env.example .env            # macOS/Linux: cp .env.example .env
-#    edit .env → DATABASE_URL (Supabase Session pooler URI) and SECRET_KEY
+#    edit .env → DATABASE_URL (Supabase Transaction pooler URI) and SECRET_KEY
 
 # 3. Create tables and the first admin in Supabase
 python manage.py init-db
@@ -151,7 +153,7 @@ Optional, for a demo with charts full of data: `python manage.py seed-demo --cou
 
 | Variable | Required | Example / default | Meaning |
 |---|---|---|---|
-| `DATABASE_URL` | **yes** | `postgresql://postgres.xxxx:PASS@aws-0-ap-south-1.pooler.supabase.com:5432/postgres` | Supabase connection string (Session pooler) |
+| `DATABASE_URL` | **yes** | `postgresql://postgres.xxxx:PASS@aws-0-ap-south-1.pooler.supabase.com:6543/postgres` | Supabase connection string (Transaction pooler) |
 | `SECRET_KEY` | yes in production | 64 random hex chars | Signs session cookies. Generate: `python -c "import secrets; print(secrets.token_hex(32))"` |
 | `FLASK_ENV` | no | `production` | `development` allows HTTP cookies and a temporary secret |
 | `DB_POOL_MIN` / `DB_POOL_MAX` | no | `1` / `5` | Connection pool size |
@@ -163,7 +165,7 @@ Optional, for a demo with charts full of data: `python manage.py seed-demo --cou
 | `SERVE_FRONTEND` | no | `true` | Flask serves `frontend/` |
 
 ## 10. API documentation
-Base URL: same origin (e.g. `https://campusvoice.onrender.com`). All bodies are JSON. Errors look like `{"error": "message", "fields": {"field": "message"}}`.
+Base URL: same origin (e.g. `https://campusvoice.vercel.app`). All bodies are JSON. Errors look like `{"error": "message", "fields": {"field": "message"}}`.
 
 ### Public
 | Method & path | Description | Success | Errors |
@@ -218,13 +220,13 @@ curl -b cookies.txt "http://localhost:5000/api/feedback?category=Canteen"
 ## 11. Cloud deployment
 Step-by-step instructions, free-tier limits and troubleshooting: **[docs/deployment.md](docs/deployment.md)**. In short:
 
-1. **Supabase**: create a project, run `database/schema.sql` in the SQL Editor, copy the *Session pooler* connection string.
+1. **Supabase**: create a project, run `database/schema.sql` in the SQL Editor, copy the *Transaction pooler* connection string.
 2. `python manage.py create-admin` with that `DATABASE_URL`.
 3. Push to **GitHub**.
-4. **Render**: New → Blueprint → select the repo → paste `DATABASE_URL` → Apply.
-5. Verify: `python backend/verify_deployment.py https://<your-app>.onrender.com`, then open the URL on a phone using mobile data.
+4. **Vercel**: Add New → Project → import the repo → Root Directory = repo root, Preset = Other → add `FLASK_ENV`, `SECRET_KEY`, `DATABASE_URL` → Deploy.
+5. Verify: `python backend/verify_deployment.py https://<your-app>.vercel.app`, then open the URL on a phone using mobile data.
 
-**Free-tier notes:** the Render free instance sleeps after 15 minutes idle (the first request then takes ~30–60 s). Supabase free projects pause after 7 days without activity (restore from the dashboard). Neither charges anything unless you upgrade.
+**Free-tier notes:** Vercel functions scale to zero when idle (the first request then has a short cold start of ~1–3 s). Supabase free projects pause after 7 days without activity (restore from the dashboard). Neither charges anything unless you upgrade.
 
 ## 12. Testing
 
@@ -297,7 +299,7 @@ A sample generated PDF report is in [`docs/screenshots/sample-report.pdf`](docs/
 | CSV export & printable report | ✅ Implemented & tested |
 | Security (validation, SQLi, XSS/CSP, CSRF, rate limiting, headers) | ✅ Implemented & tested |
 | Responsive layout | ✅ Tested at 1366 px and 390 px |
-| Deployment configuration (`render.yaml`, env vars, health check) | ✅ Prepared |
+| Deployment configuration (`vercel.json`, `api/index.py`, env vars, health check) | ✅ Prepared |
 | **Connection to *your* Supabase project** | ⏳ Needs your `DATABASE_URL` (docs/deployment.md §1–3) |
-| **Live deployment on Render** | ⏳ Needs your GitHub + Render accounts (docs/deployment.md §5–6) |
+| **Live deployment on Vercel** (frontend + backend) | ⏳ Needs your GitHub + Vercel accounts (docs/deployment.md §5–6) |
 | Verification of the live deployment | ⏳ Run `verify_deployment.py` after deploying |

@@ -1,7 +1,7 @@
 """
 Verify a DEPLOYED instance end-to-end over the internet.
 
-    python verify_deployment.py https://campusvoice.onrender.com
+    python verify_deployment.py https://campusvoice.vercel.app
 
 What it proves:
   1. The server is reachable from this machine (remote accessibility).
@@ -22,7 +22,7 @@ import urllib.error
 import urllib.request
 
 if len(sys.argv) != 2:
-    sys.exit("Usage: python verify_deployment.py https://your-app.onrender.com")
+    sys.exit("Usage: python verify_deployment.py https://your-app.vercel.app")
 
 BASE = sys.argv[1].rstrip("/")
 opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
@@ -49,7 +49,7 @@ def step(name, ok, detail=""):
     print(f"  [{'PASS' if ok else 'FAIL'}] {name}" + (f" — {detail}" if detail else ""))
 
 
-print(f"Verifying {BASE}\n(the first request can take ~60 s if the free Render instance is asleep)\n")
+print(f"Verifying {BASE}\n(the first request can take a few seconds while the Vercel function cold-starts)\n")
 
 start = time.time()
 status, body = call("GET", "/api/health")

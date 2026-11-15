@@ -10,7 +10,7 @@ Short, accurate answers you can expand on. Where useful, the file to open during
 Paper or ad-hoc feedback is slow to collect, easy to lose and hard to analyse. Our system collects feedback online from any device, stores it in a managed cloud database, and gives administrators search, analytics and export instantly.
 
 **2. Describe the architecture.**
-Three tiers. Presentation: HTML/CSS/JS with Bootstrap and Chart.js in the browser. Application: a Flask REST API running under Gunicorn on Render. Data: PostgreSQL on Supabase. The browser talks only to Flask over HTTPS, and only Flask talks to the database, over TLS, using a secret connection string.
+Three tiers. Presentation: HTML/CSS/JS with Bootstrap and Chart.js in the browser. Application: a Flask REST API running as a Python serverless function on Vercel, which also serves the frontend. Data: PostgreSQL on Supabase. The browser talks only to Flask over HTTPS, and only Flask talks to the database, over TLS, using a secret connection string.
 
 **3. Why didn't the frontend talk to Supabase directly?**
 Then the browser would need database credentials or the public API key, and every rule (validation, who may read what) would have to be enforced by database policies alone. Keeping a backend lets us validate, rate-limit, hash passwords and hide student data behind admin authentication. The database is never exposed to users.
@@ -22,51 +22,51 @@ An interface where resources are identified by URLs and manipulated with HTTP me
 200 OK (success), 201 Created (feedback submitted, account created), 400 Bad Request (validation failed), 401 Unauthorized (not logged in or wrong password), 404 Not Found, 409 Conflict (student ID already registered), 413 (body too large), 415 (not JSON), 429 Too Many Requests (rate limit), 500 (unexpected error), 503 (database unreachable).
 
 **6. Explain the request–response cycle for submitting feedback.**
-`feedback.js` validates the form and sends `POST /api/feedback` with JSON over HTTPS. Render's proxy passes it to Gunicorn and then Flask. Flask checks the rate limit and content type, validates every field again, and runs a parameterised `INSERT … RETURNING id` on Supabase. PostgreSQL checks constraints and stores the row. Flask returns `201` with the new ID, and the browser shows the success panel and clears the form. (See `docs/architecture.md` §4.)
+`feedback.js` validates the form and sends `POST /api/feedback` with JSON over HTTPS. Vercel's edge network passes it to our Flask serverless function. Flask checks the rate limit and content type, validates every field again, and runs a parameterised `INSERT … RETURNING id` on Supabase. PostgreSQL checks constraints and stores the row. Flask returns `201` with the new ID, and the browser shows the success panel and clears the form. (See `docs/architecture.md` §4.)
 
 **7. Why Flask and not Django?**
 Flask is minimal. For a JSON API with three tables we don't need Django's ORM, admin site or template system, and with Flask every part of the request flow is visible in our own code, which is better for learning.
 
-**8. What is Gunicorn and why is it needed?**
-A production WSGI HTTP server. Flask's built-in server is single-purpose and not secure or efficient enough for production. Gunicorn manages worker processes and threads that call our Flask app. We use 1 worker × 4 threads.
+**8. How does Flask run on Vercel?**
+Vercel runs `api/index.py` as a Python serverless function. That file imports our Flask `app`, and `vercel.json` rewrites every URL to it, so one function serves both the API and the frontend pages. Flask's built-in development server is used only locally.
 
 **9. What is WSGI?**
-Web Server Gateway Interface, the Python standard (PEP 3333) for how a web server calls a Python web application. `app:app` tells Gunicorn the module and the WSGI callable.
+Web Server Gateway Interface, the Python standard (PEP 3333) for how a web server calls a Python web application. Vercel looks for the WSGI callable named `app` in `api/index.py` and calls it for each request.
 
 ## B. Cloud computing
 
 **10. Where is cloud computing actually used in this project?**
-The application runs on Render (PaaS), the data lives in Supabase PostgreSQL (DBaaS), and both are reached over the public internet with HTTPS. Configuration comes from environment variables set in the cloud dashboard. Deployment is continuous from GitHub. Nothing runs on our own hardware once deployed.
+The frontend and backend run on Vercel (serverless PaaS), the data lives in Supabase PostgreSQL (DBaaS), and both are reached over the public internet with HTTPS. Configuration comes from environment variables set in the cloud dashboard. Deployment is continuous from GitHub. Nothing runs on our own hardware once deployed.
 
 **11. Differentiate IaaS, PaaS and SaaS with examples.**
-IaaS gives virtual machines, networks and storage, and you manage the OS (AWS EC2, Azure VMs). PaaS lets you deploy code while the provider manages runtime, OS and scaling (Render, Heroku, Google App Engine). SaaS is a finished application you use (Gmail, GitHub). Supabase is DBaaS, a managed-database flavour of PaaS.
+IaaS gives virtual machines, networks and storage, and you manage the OS (AWS EC2, Azure VMs). PaaS lets you deploy code while the provider manages runtime, OS and scaling (Vercel, Heroku, Google App Engine). SaaS is a finished application you use (Gmail, GitHub). Supabase is DBaaS, a managed-database flavour of PaaS.
 
 **12. Which deployment model is this: public, private, hybrid?**
-Public cloud: Render and Supabase are shared, multi-tenant infrastructure available to anyone.
+Public cloud: Vercel and Supabase are shared, multi-tenant infrastructure available to anyone.
 
 **13. List the NIST essential characteristics of cloud computing and map them to your project.**
 On-demand self-service (we created services from a dashboard). Broad network access (works on any device with a browser). Resource pooling (multi-tenant free tiers). Rapid elasticity (instance type and count can be changed without code changes). Measured service (usage-based quotas and billing).
 
-**14. What happens when the free Render instance "sleeps"?**
-After 15 minutes without traffic Render stops the instance (scale-to-zero). The next request starts it again, which takes about 30–60 seconds. This saves resources, at the cost of a slow first request.
+**14. What is a serverless "cold start"?**
+When no requests arrive, Vercel keeps no function instance running (scale-to-zero). The next request has to start a fresh instance and import Flask, which adds about 1–3 seconds. This saves resources, at the cost of a slightly slower first request.
 
 **15. Why do you use environment variables?**
 To keep secrets (database URL, session key) out of source code and Git, and to run the same code in different environments (local, production) with different configuration. This is a principle of the Twelve-Factor App.
 
 **16. How would you scale this application for 10,000 students?**
-Upgrade Render to a paid instance and run several instances behind its load balancer (the app is stateless, because sessions are signed cookies). Move rate-limit storage to Redis. Use Supabase's transaction pooler and a bigger compute tier. Add a `pg_trgm` index for search. Optionally cache analytics for a minute.
+Vercel already scales out automatically by running more function instances (the app is stateless, because sessions are signed cookies). Move rate-limit storage to Redis. Keep using Supabase's transaction pooler and move to a bigger compute tier. Add a `pg_trgm` index for search. Optionally cache analytics for a minute.
 
 **17. What is a connection pool and why do you need one?**
 A set of open database connections that are reused. Opening a TLS connection to a cloud database takes 100–300 ms, so reusing connections makes each request much faster and limits the total number of connections, because the Supabase free tier has a connection cap. We use `psycopg2.pool.ThreadedConnectionPool` (1–5 connections), and Supabase adds its own pooler (Supavisor).
 
-**18. Why the Supabase "Session pooler" connection string?**
-The free direct connection is IPv6-only. Render (and many networks) use IPv4. The pooler accepts IPv4 and also multiplexes connections.
+**18. Why the Supabase "Transaction pooler" connection string?**
+The free direct connection is IPv6-only, while Vercel functions (and many networks) use IPv4. The pooler accepts IPv4 and multiplexes connections; transaction mode is designed for serverless platforms where many short-lived instances connect.
 
 **19. What is a health check?**
-An endpoint the platform calls to know whether the app is working. Our `/api/health` runs `SELECT version(), NOW()` on Supabase and returns 200 only if the database answers. Render won't switch traffic to a new deployment that fails it.
+An endpoint the platform calls to know whether the app is working. Our `/api/health` runs `SELECT version(), NOW()` on Supabase and returns 200 only if the database answers. We call it after every Vercel deployment (`verify_deployment.py`) to confirm the new version can reach the database.
 
 **20. What is CI/CD here?**
-Continuous deployment: `autoDeploy: true` makes Render build and deploy every push to `main`. Continuous integration would add running `pytest` on every push, for example with GitHub Actions (a listed future enhancement).
+Continuous deployment: Vercel's GitHub integration builds and deploys every push to `main` (and gives other branches preview URLs). Continuous integration would add running `pytest` on every push, for example with GitHub Actions (a listed future enhancement).
 
 ## C. Database
 
@@ -115,7 +115,7 @@ Cross-site request forgery: another website making the victim's browser send an 
 Cross-Origin Resource Sharing: headers that tell browsers which other origins may call an API. In our recommended deployment Flask serves the frontend itself (same origin), so CORS is disabled. It is enabled only if `CORS_ORIGINS` is set for a separately hosted frontend.
 
 **35. How does rate limiting work?**
-Flask-Limiter counts requests per client IP per route: 5 per minute and 30 per hour for submissions, and 5 per minute and 20 per hour for admin login. Beyond that it returns 429. `ProxyFix` ensures we see the real client IP behind Render's proxy.
+Flask-Limiter counts requests per client IP per route: 5 per minute and 30 per hour for submissions, and 5 per minute and 20 per hour for admin login. Beyond that it returns 429. `ProxyFix` ensures we see the real client IP behind Vercel's proxy.
 
 **36. How is student information kept private?**
 Students' data is returned only by admin-protected endpoints. A logged-in student can see only rows linked to their own account. The `/api/session` endpoint describes only the caller's own login. The database is not publicly reachable, and Supabase's public API is locked by RLS.
