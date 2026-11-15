@@ -284,21 +284,3 @@ A sample generated PDF report is in [`docs/screenshots/sample-report.pdf`](docs/
 * GitHub Actions CI to run `pytest` on every push
 * Custom domain and dark mode
 
-## 15. Implementation status
-
-| Area | Status |
-|---|---|
-| Database schema (tables, constraints, indexes, RLS) | ✅ Implemented & tested (PostgreSQL 16) |
-| Flask REST API (all required endpoints + pagination) | ✅ Implemented & tested (31 pytest tests) |
-| Student portal (home, form, validation, stars, success, reset) | ✅ Implemented & browser-tested |
-| Student accounts + submission history | ✅ Implemented & tested |
-| Admin auth (hashing, sessions, protected routes, logout) | ✅ Implemented & tested |
-| Admin dashboard (cards, table, search, filters, sort, detail) | ✅ Implemented & browser-tested |
-| Analytics (4 Chart.js charts) | ✅ Implemented & values verified by tests |
-| CSV export & printable report | ✅ Implemented & tested |
-| Security (validation, SQLi, XSS/CSP, CSRF, rate limiting, headers) | ✅ Implemented & tested |
-| Responsive layout | ✅ Tested at 1366 px and 390 px |
-| Deployment configuration (`vercel.json`, `api/index.py`, env vars, health check) | ✅ Prepared |
-| **Connection to *your* Supabase project** | ⏳ Needs your `DATABASE_URL` (docs/deployment.md §1–3) |
-| **Live deployment on Vercel** (frontend + backend) | ⏳ Needs your GitHub + Vercel accounts (docs/deployment.md §5–6) |
-| Verification of the live deployment | ⏳ Run `verify_deployment.py` after deploying |
