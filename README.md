@@ -275,8 +275,6 @@ Captured from the running application during the end-to-end test (sample data fr
 | Printable report ![](docs/screenshots/11-printable-report.png) | Student history ![](docs/screenshots/13-student-history.png) |
 | Mobile home ![](docs/screenshots/14-mobile-home.png) | Mobile dashboard ![](docs/screenshots/16-mobile-dashboard.png) |
 
-A sample generated PDF report is in [`docs/screenshots/sample-report.pdf`](docs/screenshots/sample-report.pdf).
-*After deploying, add a screenshot of the live URL and of the Supabase Table Editor showing the rows.*
 
 ## 14. Future enhancements
 * Email confirmation to students and weekly summary emails to admins
